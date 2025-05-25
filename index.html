@@ -1,0 +1,972 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة الوحدات السكنية</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #3f51b5;
+            --secondary-color: #303f9f;
+            --accent-color: #ff5722;
+            --light-color: #f5f5f5;
+            --dark-color: #212121;
+            --success-color: #4caf50;
+            --info-color: #00bcd4;
+            --warning-color: #ffc107;
+            --danger-color: #f44336;
+        }
+        
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: var(--light-color);
+            color: var(--dark-color);
+            padding-bottom: 2rem;
+        }
+        
+        .app-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.2rem 0;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-bottom: 1.5rem;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+        
+        .app-title {
+            font-weight: 700;
+            font-size: 1.5rem;
+            text-shadow: 1px 1px 3px rgba(0,0,0,0.2);
+        }
+        
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.08);
+            margin-bottom: 1.5rem;
+            transition: transform 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+        }
+        
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 0 !important;
+            padding: 1rem;
+            font-weight: 700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--secondary-color);
+        }
+        
+        .form-control, .form-select {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            border: 2px solid #e0e0e0;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(63, 81, 181, 0.25);
+        }
+        
+        @media (max-width: 768px) {
+            .app-title {
+                font-size: 1.3rem;
+            }
+            
+            .card-header {
+                font-size: 1rem;
+                padding: 0.8rem;
+            }
+            
+            .form-control, .form-select {
+                padding: 0.65rem 0.9rem;
+                font-size: 0.9rem;
+            }
+            
+            .col-md-4, .col-md-6 {
+                margin-bottom: 0.5rem;
+            }
+            
+            .table-responsive {
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+            
+            .table th, .table td {
+                white-space: nowrap;
+                font-size: 0.85rem;
+                padding: 0.5rem;
+            }
+            
+            .badge-status {
+                padding: 0.3rem 0.6rem;
+                font-size: 0.8rem;
+            }
+            
+            .btn-table-action {
+                width: 28px;
+                height: 28px;
+                font-size: 0.8rem;
+            }
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 1.5rem 0;
+            flex-wrap: wrap;
+        }
+        
+        .nav-btn {
+            width: 2.8rem;
+            height: 2.8rem;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .nav-btn:hover {
+            background-color: var(--secondary-color);
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .nav-btn i {
+            font-size: 1.1rem;
+        }
+        
+        .record-counter {
+            background-color: white;
+            color: var(--dark-color);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 700;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 0 0.5rem;
+            min-width: 70px;
+            text-align: center;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+        
+        .action-btn {
+            min-width: 100px;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            border: none;
+        }
+        
+        .action-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        
+        .btn-new {
+            background-color: var(--info-color);
+            color: white;
+        }
+        
+        .btn-save {
+            background-color: var(--success-color);
+            color: white;
+        }
+        
+        .btn-delete {
+            background-color: var(--danger-color);
+            color: white;
+        }
+        
+        .btn-report {
+            background-color: var(--accent-color);
+            color: white;
+        }
+        
+        .table-responsive {
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            width: 100%;
+        }
+        
+        .table {
+            margin-bottom: 0;
+            width: 100%;
+        }
+        
+        .table th {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            padding: 1rem;
+            text-align: center;
+        }
+        
+        .table td {
+            padding: 0.8rem;
+            vertical-align: middle;
+            text-align: center;
+            font-weight: 500;
+        }
+        
+        .table tr:nth-child(even) {
+            background-color: rgba(245, 245, 245, 0.5);
+        }
+        
+        .table tr:hover {
+            background-color: rgba(63, 81, 181, 0.1);
+        }
+        
+        .badge-status {
+            padding: 0.4rem 0.8rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+        
+        .btn-table-action {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+        }
+        
+        #reportContainer, #searchReportContainer {
+            position: absolute;
+            left: -9999px;
+            width: 100%;
+            max-width: 800px;
+            padding: 1.5rem;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.15);
+        }
+        
+        .report-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.2rem;
+            border-radius: 12px 12px 0 0;
+            margin-bottom: 1.5rem;
+            text-align: center;
+        }
+        
+        .report-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        
+        .report-date {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .report-body {
+            padding: 1rem;
+        }
+        
+        .report-row {
+            display: flex;
+            margin-bottom: 0.8rem;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 0.8rem;
+            flex-wrap: wrap;
+        }
+        
+        .report-label {
+            font-weight: 700;
+            width: 40%;
+            color: var(--secondary-color);
+            font-size: 0.95rem;
+        }
+        
+        .report-value {
+            width: 60%;
+            font-weight: 500;
+            font-size: 0.95rem;
+        }
+        
+        .report-footer {
+            text-align: center;
+            margin-top: 1.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #eee;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        @media (max-width: 576px) {
+            .report-row {
+                flex-direction: column;
+            }
+            
+            .report-label,
+            .report-value {
+                width: 100%;
+            }
+            
+            .report-label {
+                margin-bottom: 0.3rem;
+            }
+        }
+        
+        .export-search-results {
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .import-excel-btn {
+            background-color: #673ab7;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <header class="app-header">
+        <div class="container">
+            <h1 class="app-title text-center mb-0">
+                <i class="fas fa-home me-2"></i>نظام إدارة الوحدات السكنية
+            </h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <!-- بطاقة استيراد البيانات -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-file-import"></i>استيراد البيانات من Excel
+            </div>
+            <div class="card-body">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-9 col-8">
+                        <input type="file" id="excelFileInput" class="form-control" accept=".xlsx, .xls, .csv">
+                    </div>
+                    <div class="col-md-3 col-4">
+                        <button id="importExcelBtn" class="btn import-excel-btn w-100 py-2">
+                            <i class="fas fa-file-import me-1"></i>استيراد
+                        </button>
+                    </div>
+                </div>
+                <div id="importStatus" class="mt-2 text-center"></div>
+            </div>
+        </div>
+
+        <!-- بطاقة البحث -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-search"></i>البحث في السجلات
+            </div>
+            <div class="card-body">
+                <div class="row g-2 align-items-center">
+                    <div class="col-md-9 col-8">
+                        <input type="text" id="searchInput" class="form-control" placeholder="ابحث باسم الشاغل أو رقم الشقة...">
+                    </div>
+                    <div class="col-md-3 col-4">
+                        <button id="searchBtn" class="btn btn-primary w-100 py-2">
+                            <i class="fas fa-search me-1"></i>بحث
+                        </button>
+                    </div>
+                </div>
+                <button id="exportSearchResults" class="btn btn-success w-100 mt-2 export-search-results">
+                    <i class="fas fa-file-export me-1"></i>تصدير نتائج البحث
+                </button>
+            </div>
+        </div>
+
+        <!-- بطاقة إدارة السجلات -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <i class="fas fa-edit"></i>تسجيل البيانات
+            </div>
+            <div class="card-body">
+                <form id="recordForm">
+                    <!-- معلومات الموقع -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-4 col-12">
+                            <label for="building" class="form-label">العمارة</label>
+                            <input type="text" class="form-control" id="building" placeholder="رقم العمارة">
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="apartment" class="form-label">الشقة</label>
+                            <input type="text" class="form-control" id="apartment" placeholder="رقم الشقة">
+                        </div>
+                        <div class="col-md-4 col-12">
+                            <label for="occupationType" class="form-label">نوع الإشغال</label>
+                            <select class="form-select" id="occupationType">
+                                <option value="عقد">عقد</option>
+                                <option value="اقتحام">اقتحام</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- المعلومات الأساسية -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6 col-12">
+                            <label for="name" class="form-label">اسم الشاغل</label>
+                            <input type="text" class="form-control" id="name" required placeholder="الاسم الكامل للشاغل">
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="station" class="form-label">المحطة</label>
+                            <input type="text" class="form-control" id="station" placeholder="المحطة التابع لها">
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="job" class="form-label">الوظيفة</label>
+                            <input type="text" class="form-control" id="job" placeholder="الوظيفة أو التخصص">
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="employeeStatus" class="form-label">حالة الموظف</label>
+                            <select class="form-select" id="employeeStatus">
+                                <option value="بالخدمة">بالخدمة</option>
+                                <option value="خارج الخدمة">خارج الخدمة</option>
+                                <option value="متقاعد">متقاعد</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- تفاصيل الإشغال -->
+                    <div class="row g-3 mb-3">
+                        <div class="col-md-6 col-12">
+                            <label for="occupationDate" class="form-label">تاريخ الإشغال</label>
+                            <input type="date" class="form-control" id="occupationDate">
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="waterMeter" class="form-label">عداد المياه</label>
+                            <select class="form-select" id="waterMeter">
+                                <option value="على حساب الهيئة">على حساب الهيئة</option>
+                                <option value="على الحساب الشخصي">على الحساب الشخصي</option>
+                                <option value="غير متوفر">غير متوفر</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 col-12">
+                            <label for="electricityMeter" class="form-label">عداد الكهرباء</label>
+                            <select class="form-select" id="electricityMeter">
+                                <option value="على حساب الهيئة">على حساب الهيئة</option>
+                                <option value="على الحساب الشخصي">على الحساب الشخصي</option>
+                                <option value="غير متوفر">غير متوفر</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <!-- الملاحظات -->
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">ملاحظات إضافية</label>
+                        <textarea class="form-control" id="notes" rows="2" placeholder="أي ملاحظات أو تفاصيل إضافية"></textarea>
+                    </div>
+
+                    <!-- أزرار التنقل المحسنة -->
+                    <div class="nav-buttons">
+                        <button type="button" id="firstBtn" class="nav-btn" title="السجل الأول">
+                            <i class="fas fa-angle-double-right"></i>
+                        </button>
+                        <button type="button" id="prevBtn" class="nav-btn" title="السابق">
+                            <i class="fas fa-angle-right"></i>
+                        </button>
+                        <span id="recordCounter" class="record-counter">0/0</span>
+                        <button type="button" id="nextBtn" class="nav-btn" title="التالي">
+                            <i class="fas fa-angle-left"></i>
+                        </button>
+                        <button type="button" id="lastBtn" class="nav-btn" title="السجل الأخير">
+                            <i class="fas fa-angle-double-left"></i>
+                        </button>
+                    </div>
+
+                    <!-- أزرار الإجراءات -->
+                    <div class="action-buttons">
+                        <button type="button" id="newBtn" class="action-btn btn-new">
+                            <i class="fas fa-file-alt"></i>جديد
+                        </button>
+                        <button type="submit" id="saveBtn" class="action-btn btn-save">
+                            <i class="fas fa-save"></i>حفظ
+                        </button>
+                        <button type="button" id="deleteBtn" class="action-btn btn-delete">
+                            <i class="fas fa-trash-alt"></i>حذف
+                        </button>
+                        <button type="button" id="reportBtn" class="action-btn btn-report">
+                            <i class="fas fa-file-pdf"></i>تقرير
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- بطاقة عرض السجلات -->
+        <div class="card">
+            <div class="card-header">
+                <i class="fas fa-list"></i>كشف الوحدات السكنية
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover mb-0">
+                        <thead>
+                            <tr>
+                                <th>العمارة</th>
+                                <th>الشقة</th>
+                                <th>اسم الشاغل</th>
+                                <th>نوع الإشغال</th>
+                                <th>حالة الموظف</th>
+                                <th>إجراءات</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recordsTable">
+                            <!-- البيانات ستظهر هنا -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- قسم التقرير المخفي -->
+    <div id="reportContainer">
+        <div class="report-header">
+            <div class="report-title">تقرير الوحدة السكنية</div>
+            <div class="report-date" id="reportDate"></div>
+        </div>
+        <div class="report-body" id="reportBody">
+            <!-- سيتم ملؤه بالبيانات ديناميكيًا -->
+        </div>
+        <div class="report-footer">
+            تم إنشاء هذا التقرير بواسطة مكتب مفتش دريسة المكس
+        </div>
+    </div>
+
+    <!-- تقرير نتائج البحث -->
+    <div id="searchReportContainer">
+        <div class="report-header">
+            <div class="report-title">تقرير نتائج البحث</div>
+            <div class="report-date" id="searchReportDate"></div>
+        </div>
+        <div class="report-body" id="searchReportBody">
+            <!-- سيتم ملؤه بالبيانات ديناميكيًا -->
+        </div>
+        <div class="report-footer">
+            تم إنشاء هذا التقرير بواسطة مكتب مفتش دريسة المكس
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script>
+        let records = [];
+        let currentRecordIndex = 0;
+        let searchResults = [];
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const savedData = localStorage.getItem('housingRecords');
+            if (savedData) {
+                records = JSON.parse(savedData);
+            }
+            displayRecords();
+            showRecord(currentRecordIndex);
+
+            // إعداد معالجات الأحداث
+            document.getElementById('newBtn').addEventListener('click', newRecord);
+            document.getElementById('saveBtn').addEventListener('click', saveRecord);
+            document.getElementById('deleteBtn').addEventListener('click', deleteRecord);
+            document.getElementById('searchBtn').addEventListener('click', searchRecords);
+            document.getElementById('exportSearchResults').addEventListener('click', exportSearchResults);
+            document.getElementById('firstBtn').addEventListener('click', () => showRecord(0));
+            document.getElementById('prevBtn').addEventListener('click', prevRecord);
+            document.getElementById('nextBtn').addEventListener('click', nextRecord);
+            document.getElementById('lastBtn').addEventListener('click', () => showRecord(records.length - 1));
+            document.getElementById('reportBtn').addEventListener('click', generateReport);
+            document.getElementById('searchInput').addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') searchRecords();
+            });
+            document.getElementById('importExcelBtn').addEventListener('click', importExcel);
+        });
+
+        function displayRecords() {
+            const tableBody = document.getElementById('recordsTable');
+            tableBody.innerHTML = '';
+            const dataToDisplay = searchResults.length > 0 ? searchResults : records;
+
+            dataToDisplay.forEach((record, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record['العمارة']}</td>
+                    <td>${record['الشقة']}</td>
+                    <td>${record['اسم الشاغل']}</td>
+                    <td>${record['نوع الإشغال']}</td>
+                    <td>
+                        <span class="badge ${getStatusBadgeClass(record['حالة الموظف'])}">
+                            ${record['حالة الموظف']}
+                        </span>
+                    </td>
+                    <td>
+                        <button class="btn btn-sm btn-outline-primary btn-table-action" onclick="showRecord(${index})" title="تعديل">
+                            <i class="fas fa-edit"></i>
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+
+            updateCounter();
+            document.getElementById('exportSearchResults').style.display = searchResults.length > 0 ? 'block' : 'none';
+        }
+
+        function getStatusBadgeClass(status) {
+            switch(status) {
+                case 'بالخدمة': return 'bg-success';
+                case 'متقاعد': return 'bg-warning text-dark';
+                default: return 'bg-danger';
+            }
+        }
+
+        function showRecord(index) {
+            const dataToUse = searchResults.length > 0 ? searchResults : records;
+            if (index >= 0 && index < dataToUse.length) {
+                currentRecordIndex = records.findIndex(r => 
+                    r['العمارة'] === dataToUse[index]['العمارة'] && 
+                    r['الشقة'] === dataToUse[index]['الشقة']
+                );
+                const record = dataToUse[index];
+
+                // تعبئة النموذج
+                document.getElementById('building').value = record['العمارة'];
+                document.getElementById('apartment').value = record['الشقة'];
+                document.getElementById('name').value = record['اسم الشاغل'];
+                document.getElementById('station').value = record['المحطة'];
+                document.getElementById('job').value = record['الوظيفة'];
+                document.getElementById('occupationType').value = record['نوع الإشغال'] || 'عقد';
+                document.getElementById('employeeStatus').value = record['حالة الموظف'] || 'بالخدمة';
+                document.getElementById('occupationDate').value = formatDate(record['تاريخ الإشغال']);
+                document.getElementById('waterMeter').value = record['عداد المياه'] || 'على حساب الهيئة';
+                document.getElementById('electricityMeter').value = record['عداد الكهرباء'] || 'على حساب الهيئة';
+                document.getElementById('notes').value = record['ملاحظات'] || '';
+
+                updateCounter();
+            }
+        }
+
+        function formatDate(dateString) {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            if (isNaN(date)) return dateString;
+            return date.toISOString().split('T')[0];
+        }
+
+        function newRecord() {
+            document.getElementById('recordForm').reset();
+            searchResults = [];
+            currentRecordIndex = -1;
+            updateCounter();
+            displayRecords();
+        }
+
+        function saveRecord(e) {
+            e.preventDefault();
+            const record = {
+                "العمارة": document.getElementById('building').value,
+                "الشقة": document.getElementById('apartment').value,
+                "اسم الشاغل": document.getElementById('name').value,
+                "المحطة": document.getElementById('station').value,
+                "الوظيفة": document.getElementById('job').value,
+                "نوع الإشغال": document.getElementById('occupationType').value,
+                "حالة الموظف": document.getElementById('employeeStatus').value,
+                "تاريخ الإشغال": document.getElementById('occupationDate').value,
+                "عداد المياه": document.getElementById('waterMeter').value,
+                "عداد الكهرباء": document.getElementById('electricityMeter').value,
+                "ملاحظات": document.getElementById('notes').value
+            };
+
+            if (!record['العمارة'] || !record['الشقة'] || !record['اسم الشاغل']) {
+                showAlert('الرجاء إدخال العمارة ورقم الشقة واسم الشاغل', 'warning');
+                return;
+            }
+
+            const existingIndex = records.findIndex(r => 
+                r['العمارة'] === record['العمارة'] && 
+                r['الشقة'] === record['الشقة']
+            );
+
+            if (existingIndex >= 0) {
+                records[existingIndex] = record;
+                currentRecordIndex = existingIndex;
+            } else {
+                records.push(record);
+                currentRecordIndex = records.length - 1;
+            }
+
+            saveToLocalStorage();
+            displayRecords();
+            showRecord(currentRecordIndex);
+            showAlert('تم حفظ البيانات بنجاح', 'success');
+        }
+
+        function deleteRecord() {
+            if (currentRecordIndex < 0 || currentRecordIndex >= records.length) {
+                showAlert('لا يوجد سجل محدد للحذف', 'warning');
+                return;
+            }
+
+            if (confirm('هل أنت متأكد من حذف هذا السجل؟')) {
+                records.splice(currentRecordIndex, 1);
+                saveToLocalStorage();
+                displayRecords();
+                newRecord();
+                showAlert('تم حذف السجل بنجاح', 'success');
+            }
+        }
+
+        function searchRecords() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            searchResults = records.filter(record => 
+                (record['اسم الشاغل']?.toLowerCase().includes(searchTerm)) || 
+                (record['الشقة']?.toString().includes(searchTerm)) ||
+                (record['العمارة']?.toString().includes(searchTerm))
+            );
+
+            displayRecords();
+            if (searchResults.length > 0) {
+                showRecord(0);
+                showAlert(`تم العثور على ${searchResults.length} نتيجة`, 'success');
+            } else {
+                showAlert('لا توجد نتائج مطابقة للبحث', 'warning');
+            }
+        }
+
+        function exportSearchResults() {
+            if (searchResults.length === 0) {
+                showAlert('لا توجد نتائج بحث لتصديرها', 'warning');
+                return;
+            }
+
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('searchReportDate').textContent = `تاريخ التقرير: ${now.toLocaleDateString('ar-EG', options)}`;
+            
+            const reportBody = document.getElementById('searchReportBody');
+            reportBody.innerHTML = '';
+            
+            searchResults.forEach((record, index) => {
+                const fields = [
+                    {label: 'العمارة', value: record['العمارة']},
+                    {label: 'الشقة', value: record['الشقة']},
+                    {label: 'اسم الشاغل', value: record['اسم الشاغل']},
+                    {label: 'المحطة', value: record['المحطة']},
+                    {label: 'الوظيفة', value: record['الوظيفة']},
+                    {label: 'نوع الإشغال', value: record['نوع الإشغال']},
+                    {label: 'حالة الموظف', value: record['حالة الموظف']},
+                    {label: 'تاريخ الإشغال', value: record['تاريخ الإشغال'] || 'غير محدد'},
+                    {label: 'عداد المياه', value: record['عداد المياه']},
+                    {label: 'عداد الكهرباء', value: record['عداد الكهرباء']},
+                    {label: 'ملاحظات', value: record['ملاحظات'] || 'لا يوجد'}
+                ];
+                
+                fields.forEach(field => {
+                    const row = document.createElement('div');
+                    row.className = 'report-row';
+                    row.innerHTML = `
+                        <div class="report-label">${field.label}</div>
+                        <div class="report-value">${field.value}</div>
+                    `;
+                    reportBody.appendChild(row);
+                });
+            });
+            
+            const reportContainer = document.getElementById('searchReportContainer');
+            html2canvas(reportContainer).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `نتائج_البحث_${new Date().toISOString().slice(0,10)}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                showAlert('تم تصدير نتائج البحث بنجاح', 'success');
+            });
+        }
+
+        function prevRecord() {
+            const dataToUse = searchResults.length > 0 ? searchResults : records;
+            const currentIndexInDisplay = dataToUse.findIndex(r => 
+                r['العمارة'] === records[currentRecordIndex]['العمارة'] && 
+                r['الشقة'] === records[currentRecordIndex]['الشقة']
+            );
+            
+            if (currentIndexInDisplay > 0) {
+                showRecord(currentIndexInDisplay - 1);
+            } else {
+                showAlert('هذا هو السجل الأول', 'info');
+            }
+        }
+
+        function nextRecord() {
+            const dataToUse = searchResults.length > 0 ? searchResults : records;
+            const currentIndexInDisplay = dataToUse.findIndex(r => 
+                r['العمارة'] === records[currentRecordIndex]['العمارة'] && 
+                r['الشقة'] === records[currentRecordIndex]['الشقة']
+            );
+            
+            if (currentIndexInDisplay < dataToUse.length - 1) {
+                showRecord(currentIndexInDisplay + 1);
+            } else {
+                showAlert('هذا هو السجل الأخير', 'info');
+            }
+        }
+
+        function updateCounter() {
+            const dataToUse = searchResults.length > 0 ? searchResults : records;
+            const currentIndex = dataToUse.findIndex(r => 
+                r['العمارة'] === records[currentRecordIndex]?.['العمارة'] && 
+                r['الشقة'] === records[currentRecordIndex]?.['الشقة']
+            ) + 1 || 0;
+            
+            document.getElementById('recordCounter').textContent = 
+                `${currentIndex}/${dataToUse.length}`;
+        }
+
+        function saveToLocalStorage() {
+            localStorage.setItem('housingRecords', JSON.stringify(records));
+        }
+
+        function generateReport() {
+            if (currentRecordIndex < 0 || currentRecordIndex >= records.length) {
+                showAlert('لا يوجد سجل معروض لإنشاء التقرير', 'warning');
+                return;
+            }
+
+            const now = new Date();
+            const options = { year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('reportDate').textContent = `تاريخ التقرير: ${now.toLocaleDateString('ar-EG', options)}`;
+            
+            const reportBody = document.getElementById('reportBody');
+            reportBody.innerHTML = '';
+            
+            const currentRecord = records[currentRecordIndex];
+            const fields = [
+                {label: 'العمارة', value: currentRecord['العمارة']},
+                {label: 'الشقة', value: currentRecord['الشقة']},
+                {label: 'اسم الشاغل', value: currentRecord['اسم الشاغل']},
+                {label: 'المحطة', value: currentRecord['المحطة']},
+                {label: 'الوظيفة', value: currentRecord['الوظيفة']},
+                {label: 'نوع الإشغال', value: currentRecord['نوع الإشغال']},
+                {label: 'حالة الموظف', value: currentRecord['حالة الموظف']},
+                {label: 'تاريخ الإشغال', value: currentRecord['تاريخ الإشغال'] || 'غير محدد'},
+                {label: 'عداد المياه', value: currentRecord['عداد المياه']},
+                {label: 'عداد الكهرباء', value: currentRecord['عداد الكهرباء']},
+                {label: 'ملاحظات', value: currentRecord['ملاحظات'] || 'لا يوجد'}
+            ];
+            
+            fields.forEach(field => {
+                const row = document.createElement('div');
+                row.className = 'report-row';
+                row.innerHTML = `
+                    <div class="report-label">${field.label}</div>
+                    <div class="report-value">${field.value}</div>
+                `;
+                reportBody.appendChild(row);
+            });
+            
+            const reportContainer = document.getElementById('reportContainer');
+            html2canvas(reportContainer).then(canvas => {
+                const link = document.createElement('a');
+                link.download = `تقرير_${currentRecord['اسم الشاغل']}_${currentRecord['العمارة']}_${currentRecord['الشقة']}.jpg`;
+                link.href = canvas.toDataURL('image/jpeg', 0.9);
+                link.click();
+                showAlert('تم إنشاء التقرير بنجاح', 'success');
+            });
+        }
+
+        function importExcel() {
+            const fileInput = document.getElementById('excelFileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                showAlert('الرجاء اختيار ملف Excel أولاً', 'warning');
+                return;
+            }
+            
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const firstSheetName = workbook.SheetNames[0];
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet);
+                    
+                    records = jsonData.map(row => ({
+                        "العمارة": row["رقم العمارة"]?.toString() || '',
+                        "الشقة": row["رقم الشقة"]?.toString() || '',
+                        "اسم الشاغل": row["الاسم"] || '',
+                        "المحطة": row["المحطة"] || '',
+                        "الوظيفة": row["الوظيفة"] || '',
+                        "نوع الإشغال": row["حالة السكن"] || 'عقد',
+                        "حالة الموظف": row["حالة الموظف"] || 'بالخدمة',
+                        "تاريخ الإشغال": row["تاريخ الاشغال"]?.toString() || '',
+                        "عداد المياه": row["عداد المياة"] || 'على حساب الهيئة',
+                        "عداد الكهرباء": row["عداد الكهرباء"] || 'على حساب الهيئة',
+                        "ملاحظات": row["ملاحظــــــــــــــــــــــــــــــــــــــــــــــــات"] || ''
+                    }));
+                    
+                    saveToLocalStorage();
+                    displayRecords();
+                    showRecord(0);
+                    showAlert(`تم استيراد ${records.length} سجل بنجاح`, 'success');
+                    
+                } catch (error) {
+                    console.error('Error importing Excel:', error);
+                    showAlert('حدث خطأ أثناء قراءة الملف', 'danger');
+                }
+            };
+            
+            reader.readAsArrayBuffer(file);
+        }
+
+        function showAlert(message, type) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = `alert alert-${type} position-fixed top-0 start-50 translate-middle-x mt-3`;
+            alertDiv.style.zIndex = '2000';
+            alertDiv.textContent = message;
+            document.body.appendChild(alertDiv);
+            setTimeout(() => alertDiv.remove(), 3000);
+        }
+    </script>
+</body>
+</html>
